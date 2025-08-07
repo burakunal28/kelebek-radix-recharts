@@ -1,6 +1,6 @@
 "use client";
 
-import { createColumnHelper } from "@tanstack/react-table";
+import { type ColumnDef } from "@tanstack/react-table";
 import { Badge, type BadgeProps } from "@/components/Badge";
 import { Checkbox } from "@/components/Checkbox";
 import { statuses } from "@/data/data";
@@ -10,10 +10,8 @@ import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import type { ConditionFilter } from "./DataTableFilter";
 import { DataTableRowActions } from "./DataTableRowActions";
 
-const columnHelper = createColumnHelper<Usage>();
-
-export const columns = [
-	columnHelper.display({
+export const columns: ColumnDef<Usage>[] = [
+	{
 		id: "select",
 		header: ({ table }) => (
 			<Checkbox
@@ -39,8 +37,9 @@ export const columns = [
 		meta: {
 			displayName: "Select",
 		},
-	}),
-	columnHelper.accessor("owner", {
+	},
+	{
+		accessorKey: "owner",
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Kullanıcı" />
 		),
@@ -50,8 +49,9 @@ export const columns = [
 			className: "text-left",
 			displayName: "Kullanıcı",
 		},
-	}),
-	columnHelper.accessor("status", {
+	},
+	{
+		accessorKey: "status",
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Durum" />
 		),
@@ -75,8 +75,9 @@ export const columns = [
 				</Badge>
 			);
 		},
-	}),
-	columnHelper.accessor("region", {
+	},
+	{
+		accessorKey: "region",
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Bölge" />
 		),
@@ -86,8 +87,9 @@ export const columns = [
 			displayName: "Bölge",
 		},
 		filterFn: "arrIncludesSome",
-	}),
-	columnHelper.accessor("stability", {
+	},
+	{
+		accessorKey: "stability",
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Aktiflik" />
 		),
@@ -97,7 +99,7 @@ export const columns = [
 			displayName: "Aktiflik",
 		},
 		cell: ({ getValue }) => {
-			const value = getValue();
+			const value = getValue() as number;
 
 			function Indicator({ number }: Readonly<{ number: number }>) {
 				let category: string;
@@ -140,8 +142,9 @@ export const columns = [
 				</div>
 			);
 		},
-	}),
-	columnHelper.accessor("costs", {
+	},
+	{
+		accessorKey: "costs",
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Harcama" />
 		),
@@ -152,7 +155,7 @@ export const columns = [
 		},
 		cell: ({ getValue }) => {
 			return (
-				<span className="font-medium">{formatters.currency(getValue())}</span>
+				<span className="font-medium">{formatters.currency(getValue() as number)}</span>
 			);
 		},
 		filterFn: (row, columnId, filterValue: ConditionFilter) => {
@@ -172,8 +175,9 @@ export const columns = [
 					return true;
 			}
 		},
-	}),
-	columnHelper.accessor("lastEdited", {
+	},
+	{
+		accessorKey: "lastEdited",
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Son Sipariş" />
 		),
@@ -182,8 +186,8 @@ export const columns = [
 			className: "tabular-nums",
 			displayName: "Son Sipariş",
 		},
-	}),
-	columnHelper.display({
+	},
+	{
 		id: "edit",
 		header: "Düzenle",
 		enableSorting: false,
@@ -193,5 +197,5 @@ export const columns = [
 			displayName: "Düzenle",
 		},
 		cell: ({ row }) => <DataTableRowActions row={row} />,
-	}),
+	},
 ];

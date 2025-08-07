@@ -385,7 +385,6 @@ const ChartTooltipRow = ({ value, name, color }: ChartTooltipRowProps) => (
 interface ChartTooltipProps {
   active: boolean | undefined
   payload: any
-  label: string
   categoryColors: Map<string, string>
   valueFormatter: (value: number) => string
 }
@@ -691,11 +690,10 @@ const LineChart = React.forwardRef<HTMLDivElement, LineChartProps>(
               position={{ y: 0 }}
               content={
                 showTooltip ? (
-                  ({ active, payload, label }) => (
+                  ({ active, payload }) => (
                     <OverviewChartTooltip
                       active={active}
                       payload={payload}
-                      label={label}
                       valueFormatter={valueFormatter}
                       categoryColors={categoryColors}
                     />
