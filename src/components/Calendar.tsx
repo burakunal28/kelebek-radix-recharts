@@ -8,16 +8,17 @@ import {
 	RiArrowRightDoubleLine,
 	RiArrowRightSLine,
 } from "@remixicon/react";
-import { addYears, format, isSameMonth } from "date-fns";
-import { tr } from "date-fns/locale";
+import { addYears, format } from "date-fns";
+import { tr, type Locale } from "date-fns/locale";
 import * as React from "react";
 import {
 	DayPicker,
+	type MonthCaptionProps,
 	type Matcher,
 	type PropsSingle,
 	type PropsRange,
-	useDayPicker,
-	useNavigation
+	useNavigation,
+	type ChevronProps
 } from "react-day-picker";
 
 import { cx, focusRing } from "@/lib/utils";
@@ -72,12 +73,42 @@ NavigationButton.displayName = "NavigationButton";
 
 type CalendarProps = {
 	enableYearNavigation?: boolean;
+	weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+	numberOfMonths?: number;
+	disableNavigation?: boolean;
+	locale?: Locale;
+	className?: string;
+	classNames?: Record<string, string>;
 } & (
 		| ({ mode?: "single" } & PropsSingle)
 		| ({ mode: "range" } & PropsRange)
 	);
 
-const Calendar = ({
+type CalendarSingleProps = {
+	enableYearNavigation?: boolean;
+	weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+	numberOfMonths?: number;
+	disableNavigation?: boolean;
+	locale?: Locale;
+	className?: string;
+	classNames?: Record<string, string>;
+	mode?: "single";
+} & PropsSingle;
+
+type CalendarRangeProps = {
+	enableYearNavigation?: boolean;
+	weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+	numberOfMonths?: number;
+	disableNavigation?: boolean;
+	locale?: Locale;
+	className?: string;
+	classNames?: Record<string, string>;
+	mode: "range";
+} & PropsRange;
+
+function Calendar(props: CalendarSingleProps): React.JSX.Element;
+function Calendar(props: CalendarRangeProps): React.JSX.Element;
+function Calendar({
 	mode = "single",
 	weekStartsOn = 1,
 	numberOfMonths = 1,
@@ -87,20 +118,20 @@ const Calendar = ({
 	className,
 	classNames,
 	...props
-}: CalendarProps) => {
-	return (
-		<DayPicker
-			mode={mode}
-			weekStartsOn={weekStartsOn}
-			numberOfMonths={numberOfMonths}
-			locale={locale}
-			showOutsideDays={numberOfMonths === 1}
-			className={cx(className)}
-			classNames={{
-				months: "flex space-y-0",
-				month: "space-y-4 p-3",
-				nav: "flex items-center justify-between w-full p-2",
-				table: "w-full border-collapse space-y-1",
+}: CalendarProps) {
+	const baseProps = {
+		weekStartsOn,
+		numberOfMonths,
+		locale,
+		showOutsideDays: numberOfMonths === 1,
+		className: cx(className),
+		fromDate: (props as any).fromDate,
+		toDate: (props as any).toDate,
+		classNames: {
+			months: "flex space-y-0",
+			month: "space-y-4 p-3",
+			nav: "flex items-center justify-between w-full p-2",
+			table: "w-full border-collapse space-y-1",
 				head_cell:
 					"w-9 font-medium text-sm sm:text-xs text-center text-gray-400 dark:text-gray-600 pb-2",
 				row: "w-full mt-0.5",
@@ -131,48 +162,43 @@ const Calendar = ({
 				day_range_end: "rounded-l-none !rounded-r",
 				day_hidden: "invisible",
 				...classNames,
-			}}
-			components={{
-				IconLeft: () => (
-					<RiArrowLeftSLine aria-hidden="true" className="size-4 text-gray-600 dark:text-gray-100" />
-				),
-				IconRight: () => (
-					<RiArrowRightSLine aria-hidden="true" className="size-4 text-gray-600 dark:text-gray-100" />
-				),
-				Caption: ({ ...props }) => {
+			},
+			components: {
+				Chevron: ({ orientation, ...props }: ChevronProps) => {
+					if (orientation === "left") {
+						return <RiArrowLeftSLine aria-hidden="true" className="size-4 text-gray-600 dark:text-gray-100" {...props} />;
+					}
+					return <RiArrowRightSLine aria-hidden="true" className="size-4 text-gray-600 dark:text-gray-100" {...props} />;
+				},
+				MonthCaption: (props: MonthCaptionProps) => {
 					const {
 						goToMonth,
 						nextMonth,
 						previousMonth,
-						currentMonth,
-						displayMonths,
 					} = useNavigation();
-					const { numberOfMonths, fromDate, toDate } = useDayPicker();
+					// fromDate ve toDate props'tan alınıyor
 
-					const displayIndex = displayMonths.findIndex((month) =>
-						isSameMonth(props.displayMonth, month),
-					);
-					const isFirst = displayIndex === 0;
-					const isLast = displayIndex === displayMonths.length - 1;
+					const isFirst = numberOfMonths === 1;
+					const isLast = numberOfMonths === 1;
 
 					const hideNextButton = numberOfMonths > 1 && (isFirst || !isLast);
 					const hidePreviousButton = numberOfMonths > 1 && (isLast || !isFirst);
 
 					const goToPreviousYear = () => {
-						const targetMonth = addYears(currentMonth, -1);
+						const targetMonth = addYears(props.calendarMonth.date, -1);
 						if (
 							previousMonth &&
-							(!fromDate || targetMonth.getTime() >= fromDate.getTime())
+							(!baseProps.fromDate || targetMonth.getTime() >= baseProps.fromDate.getTime())
 						) {
 							goToMonth(targetMonth);
 						}
 					};
 
 					const goToNextYear = () => {
-						const targetMonth = addYears(currentMonth, 1);
+						const targetMonth = addYears(props.calendarMonth.date, 1);
 						if (
 							nextMonth &&
-							(!toDate || targetMonth.getTime() <= toDate.getTime())
+							(!baseProps.toDate || targetMonth.getTime() <= baseProps.toDate.getTime())
 						) {
 							goToMonth(targetMonth);
 						}
@@ -185,12 +211,12 @@ const Calendar = ({
 								{enableYearNavigation && !hidePreviousButton && (
 									<NavigationButton
 										disabled={
-											disableNavigation ||
-											!previousMonth ||
-											(fromDate &&
-												addYears(currentMonth, -1).getTime() <
-												fromDate.getTime())
-										}
+									disableNavigation ||
+									!previousMonth ||
+									(baseProps.fromDate &&
+										addYears(props.calendarMonth.date, -1).getTime() <
+										baseProps.fromDate.getTime())
+								}
 										aria-label="Önceki yıla git"
 										onClick={goToPreviousYear}
 										icon={RiArrowLeftDoubleLine}
@@ -212,7 +238,7 @@ const Calendar = ({
 								aria-live="polite"
 								className="text-sm font-medium capitalize tabular-nums text-gray-900 dark:text-gray-50"
 							>
-								{format(props.displayMonth, "LLLL yyy", { locale })}
+								{format(props.calendarMonth.date, "LLLL yyy", { locale })}
 							</div>
 
 							{/* Sağ navigation butonları - mutlak konumlandırma */}
@@ -228,11 +254,11 @@ const Calendar = ({
 								{enableYearNavigation && !hideNextButton && (
 									<NavigationButton
 										disabled={
-											disableNavigation ||
-											!nextMonth ||
-											(toDate &&
-												addYears(currentMonth, 1).getTime() > toDate.getTime())
-										}
+									disableNavigation ||
+									!nextMonth ||
+									(baseProps.toDate &&
+										addYears(props.calendarMonth.date, 1).getTime() > baseProps.toDate.getTime())
+								}
 										aria-label="Sonraki yıla git"
 										onClick={goToNextYear}
 										icon={RiArrowRightDoubleLine}
@@ -242,11 +268,27 @@ const Calendar = ({
 						</div>
 					);
 				},
-			}}
-			{...props}
-		/>
-	);
-};
+			},
+		};
+
+		if (mode === "range") {
+		return (
+			<DayPicker
+				mode="range"
+				{...baseProps}
+				{...(props as any)}
+			/>
+		);
+	} else {
+		return (
+			<DayPicker
+				mode="single"
+				{...baseProps}
+				{...(props as any)}
+			/>
+		);
+	}
+}
 
 Calendar.displayName = "Calendar";
 
