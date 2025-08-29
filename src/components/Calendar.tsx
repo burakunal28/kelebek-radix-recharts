@@ -13,9 +13,11 @@ import { tr } from "date-fns/locale";
 import * as React from "react";
 import {
 	DayPicker,
+	type Matcher,
+	type PropsSingle,
+	type PropsRange,
 	useDayPicker,
-	useNavigation,
-	type Matcher
+	useNavigation
 } from "react-day-picker";
 
 import { cx, focusRing } from "@/lib/utils";
@@ -45,7 +47,7 @@ const NavigationButton = React.forwardRef<
 					"flex size-8 shrink-0 select-none items-center justify-center rounded border p-1 outline-none transition sm:size-[30px]",
 					// text color
 					"text-gray-600 hover:text-gray-800",
-					"dark:text-gray-400 hover:dark:text-gray-200",
+					"dark:text-gray-200 hover:dark:text-gray-100",
 					// border color
 					"border-gray-300 dark:border-gray-800",
 					// background color
@@ -132,10 +134,10 @@ const Calendar = ({
 			}}
 			components={{
 				IconLeft: () => (
-					<RiArrowLeftSLine aria-hidden="true" className="size-4" />
+					<RiArrowLeftSLine aria-hidden="true" className="size-4 text-gray-600 dark:text-gray-100" />
 				),
 				IconRight: () => (
-					<RiArrowRightSLine aria-hidden="true" className="size-4" />
+					<RiArrowRightSLine aria-hidden="true" className="size-4 text-gray-600 dark:text-gray-100" />
 				),
 				Caption: ({ ...props }) => {
 					const {
