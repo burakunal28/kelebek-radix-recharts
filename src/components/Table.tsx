@@ -30,18 +30,18 @@ const Table = React.forwardRef<
 	HTMLTableElement,
 	React.TableHTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, forwardedRef) => (
-    // NOSONAR – header row/column is supplied by consumer components
-    <table
-        ref={forwardedRef}
-        className={cx(
-            // base
-            "w-full caption-bottom border-b",
-            // border color
-            "border-gray-200 dark:border-gray-800",
-            className,
-        )}
-        {...props}
-    />
+	// NOSONAR – header row/column is supplied by consumer components
+	<table
+		ref={forwardedRef}
+		className={cx(
+			// base
+			"w-full caption-bottom border-b",
+			// border color
+			"border-gray-200 dark:border-gray-800",
+			className,
+		)}
+		{...props}
+	/>
 ));
 
 Table.displayName = "Table";

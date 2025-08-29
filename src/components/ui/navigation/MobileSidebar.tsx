@@ -85,7 +85,7 @@ export default function MobileSidebar() {
 			</DrawerTrigger>
 			<DrawerContent className="sm:max-w-lg">
 				<DrawerHeader>
-					<DrawerTitle>Kelebek Patisserie</DrawerTitle>
+					<DrawerTitle>Kelebek Pastanesi</DrawerTitle>
 				</DrawerHeader>
 				<DrawerBody>
 					<nav

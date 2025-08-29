@@ -17,7 +17,7 @@ import {
 } from "@react-stately/datepicker";
 import { RiCalendar2Fill, RiSubtractFill } from "@remixicon/react";
 import { format, type Locale } from "date-fns";
-import { enUS } from "date-fns/locale";
+import { tr } from "date-fns/locale";
 import * as React from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 
@@ -187,7 +187,7 @@ const triggerStyles = tv({
 
 interface TriggerProps
 	extends React.ComponentProps<"button">,
-		VariantProps<typeof triggerStyles> {
+	VariantProps<typeof triggerStyles> {
 	placeholder?: string;
 }
 
@@ -395,7 +395,7 @@ const PresetContainer = <TPreset extends Preset, TValue>({
 								},
 							)}
 							onClick={() => handleClick(preset)}
-							aria-label={`Select ${preset.label}`}
+							aria-label={`${preset.label} seç`}
 						>
 							<span>{preset.label}</span>
 						</button>
@@ -491,11 +491,11 @@ const SingleDatePicker = ({
 	disableNavigation,
 	className,
 	showTimePicker,
-	placeholder = "Select date",
+	placeholder = "Tarih seçin",
 	hasError,
 	translations,
 	enableYearNavigation = false,
-	locale = enUS,
+	locale = tr,
 	align = "center",
 	...props
 }: SingleProps) => {
@@ -653,7 +653,7 @@ const SingleDatePicker = ({
 							{showTimePicker && (
 								<div className="border-t border-gray-200 p-3 dark:border-gray-800">
 									<TimeInput
-										aria-label="Time"
+										aria-label="Saat"
 										onChange={onTimeChange}
 										isDisabled={!date}
 										value={time}
@@ -706,9 +706,9 @@ const RangeDatePicker = ({
 	disableNavigation,
 	disabledDays,
 	enableYearNavigation = false,
-	locale = enUS,
+	locale = tr,
 	showTimePicker,
-	placeholder = "Select date range",
+	placeholder = "Tarih aralığı seçin",
 	hasError,
 	translations,
 	align = "center",
@@ -933,20 +933,20 @@ const RangeDatePicker = ({
 								enableYearNavigation={enableYearNavigation}
 								locale={locale}
 								classNames={{
-									months:
-										"flex flex-row divide-x divide-gray-200 dark:divide-gray-800 overflow-x-auto",
+									months: "flex flex-row space-x-4",
+									month: "space-y-4 p-3 min-w-[280px]",
 								}}
 							/>
 							{showTimePicker && (
 								<div className="flex items-center justify-evenly gap-x-3 border-t border-gray-200 p-3 dark:border-gray-800">
 									<div className="flex flex-1 items-center gap-x-2">
 										<span className="dark:text-gray-30 text-gray-700">
-											{translations?.start ?? "Start"}:
+											{translations?.start ?? "Başlangıç"}:
 										</span>
 										<TimeInput
 											value={startTime}
 											onChange={(v) => onTimeChange(v, "start")}
-											aria-label="Start date time"
+											aria-label="Başlangıç tarihi saati"
 											isDisabled={!range?.from}
 											isRequired={props.required}
 										/>
@@ -954,12 +954,12 @@ const RangeDatePicker = ({
 									<RiSubtractFill className="size-4 shrink-0 text-gray-400" />
 									<div className="flex flex-1 items-center gap-x-2">
 										<span className="dark:text-gray-30 text-gray-700">
-											{translations?.end ?? "End"}:
+											{translations?.end ?? "Bitiş"}:
 										</span>
 										<TimeInput
 											value={endTime}
 											onChange={(v) => onTimeChange(v, "end")}
-											aria-label="End date time"
+											aria-label="Bitiş tarihi saati"
 											isDisabled={!range?.to}
 											isRequired={props.required}
 										/>
@@ -1162,5 +1162,6 @@ export {
 	DateRangePicker,
 	type DatePreset,
 	type DateRange,
-	type DateRangePreset,
+	type DateRangePreset
 };
+

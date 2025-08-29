@@ -70,20 +70,7 @@ const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
 				{...props}
 			>
 				<div className="relative w-full">
-					<progress
-						value={safeValue}
-						max={max}
-						className={cx(
-							"h-2 w-full rounded-full",
-							"[&::-webkit-progress-bar]:rounded-full",
-							`[&::-webkit-progress-bar]:${background().replace('bg-', '')}`
-						)}
-						style={{
-							// Hide default styling
-							appearance: 'none',
-							WebkitAppearance: 'none',
-						}}
-					/>
+					<div className={cx("h-2 w-full rounded-full", background())} />
 					<div
 						className={cx(
 							"absolute top-0 left-0 h-full rounded-full",

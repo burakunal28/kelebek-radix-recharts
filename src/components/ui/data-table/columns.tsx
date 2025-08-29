@@ -1,6 +1,6 @@
 "use client";
 
-import { type ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Badge, type BadgeProps } from "@/components/Badge";
 import { Checkbox } from "@/components/Checkbox";
 import { statuses } from "@/data/data";
@@ -155,7 +155,9 @@ export const columns: ColumnDef<Usage>[] = [
 		},
 		cell: ({ getValue }) => {
 			return (
-				<span className="font-medium">{formatters.currency(getValue() as number)}</span>
+				<span className="font-medium">
+					{formatters.currency(getValue() as number)}
+				</span>
 			);
 		},
 		filterFn: (row, columnId, filterValue: ConditionFilter) => {

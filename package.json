@@ -1,6 +1,6 @@
 {
-	"name": "template-dashboard-3",
-	"version": "0.1.0",
+	"name": "kelebek-radix-recharts",
+	"version": "0.2.0",
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
@@ -8,8 +8,8 @@
 		"start": "next start",
 		"lint": "pnpm biome ci",
 		"format": "pnpm biome format --write",
-		"check": "pnpm biome check --write --unsafe --max-diagnostics=100000",
-		"typecheck": "tsc --noEmit --skipLibCheck",
+		"check": "pnpm biome check --write --unsafe --max-diagnostics=4294967295",
+		"typecheck": "tsc -p tsconfig.json",
 		"update": "pnpm outdated",
 		"update:run": "pnpm update --latest"
 	},
@@ -49,7 +49,7 @@
 		"use-debounce": "^10.0.5"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.1.3",
+		"@biomejs/biome": "2.2.2",
 		"@tailwindcss/forms": "^0.5.10",
 		"@tailwindcss/postcss": "^4.1.11",
 		"@types/node": "^24.2.0",

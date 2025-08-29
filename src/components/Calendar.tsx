@@ -8,16 +8,14 @@ import {
 	RiArrowRightDoubleLine,
 	RiArrowRightSLine,
 } from "@remixicon/react";
-import { addYears, format, isSameMonth, type Locale } from "date-fns";
+import { addYears, format, isSameMonth } from "date-fns";
+import { tr } from "date-fns/locale";
 import * as React from "react";
 import {
-	type CalendarMonth,
 	DayPicker,
-	type DayPickerProps,
-	type Matcher,
-	type PropsRange,
-	type PropsSingle,
 	useDayPicker,
+	useNavigation,
+	type Matcher
 } from "react-day-picker";
 
 import { cx, focusRing } from "@/lib/utils";
@@ -70,260 +68,181 @@ const NavigationButton = React.forwardRef<
 
 NavigationButton.displayName = "NavigationButton";
 
-type KeysToOmit = "mode";
-
-type SingleProps = Omit<PropsSingle, KeysToOmit>;
-type RangeProps = Omit<PropsRange, KeysToOmit>;
-
 type CalendarProps = {
 	enableYearNavigation?: boolean;
 } & (
-	| ({
-			mode: "single";
-	  } & SingleProps)
-	| ({
-			mode?: never;
-	  } & SingleProps)
-	| ({
-			mode: "range";
-	  } & RangeProps)
-) &
-	Pick<
-		DayPickerProps,
-		| "numberOfMonths"
-		| "disableNavigation"
-		| "locale"
-		| "className"
-		| "classNames"
-	>;
-
-interface CaptionProps {
-	displayMonth: Date;
-	enableYearNavigation?: boolean;
-	disableNavigation?: boolean;
-	locale?: Pick<Locale, "options" | "localize" | "formatLong">;
-}
-
-const Caption = ({
-	displayMonth,
-	enableYearNavigation,
-	disableNavigation,
-	locale,
-}: CaptionProps) => {
-	const dayPickerContext = useDayPicker();
-	const { goToMonth, nextMonth, previousMonth } = dayPickerContext;
-
-	// Get numberOfMonths from props or default to 1
-	const numberOfMonths = 1;
-	const displayMonths = [{ date: displayMonth }];
-
-	const displayIndex =
-		displayMonths?.findIndex((month) =>
-			isSameMonth(displayMonth, month.date),
-		) || 0;
-	const isFirst = displayIndex === 0;
-	const isLast = displayIndex === (displayMonths?.length || 1) - 1;
-
-	const hideNextButton = numberOfMonths > 1 && (isFirst || !isLast);
-	const hidePreviousButton = numberOfMonths > 1 && (isLast || !isFirst);
-
-	const goToPreviousYear = () => {
-		const targetMonth = addYears(displayMonth, -1);
-		if (previousMonth && goToMonth) {
-			goToMonth(targetMonth);
-		}
-	};
-
-	const goToNextYear = () => {
-		const targetMonth = addYears(displayMonth, 1);
-		if (nextMonth && goToMonth) {
-			goToMonth(targetMonth);
-		}
-	};
-
-	return (
-		<div className="flex items-center justify-between">
-			<div className="flex items-center gap-1">
-				{enableYearNavigation && !hidePreviousButton && (
-					<NavigationButton
-						disabled={disableNavigation || !previousMonth}
-						aria-label="Go to previous year"
-						onClick={goToPreviousYear}
-						icon={RiArrowLeftDoubleLine}
-					/>
-				)}
-				{!hidePreviousButton && (
-					<NavigationButton
-						disabled={disableNavigation || !previousMonth}
-						aria-label="Go to previous month"
-						onClick={() => previousMonth && goToMonth(previousMonth)}
-						icon={RiArrowLeftSLine}
-					/>
-				)}
-			</div>
-
-			<div
-				aria-live="polite"
-				className="text-sm font-medium capitalize tabular-nums text-gray-900 dark:text-gray-50"
-			>
-				{format(displayMonth, "LLLL yyy", { locale })}
-			</div>
-
-			<div className="flex items-center gap-1">
-				{!hideNextButton && (
-					<NavigationButton
-						disabled={disableNavigation || !nextMonth}
-						aria-label="Go to next month"
-						onClick={() => nextMonth && goToMonth(nextMonth)}
-						icon={RiArrowRightSLine}
-					/>
-				)}
-				{enableYearNavigation && !hideNextButton && (
-					<NavigationButton
-						disabled={disableNavigation || !nextMonth}
-						aria-label="Go to next year"
-						onClick={goToNextYear}
-						icon={RiArrowRightDoubleLine}
-					/>
-				)}
-			</div>
-		</div>
+		| ({ mode?: "single" } & PropsSingle)
+		| ({ mode: "range" } & PropsRange)
 	);
-};
-
-const ChevronLeft = (): React.ReactElement => (
-	<RiArrowLeftSLine aria-hidden="true" className="size-4" />
-);
-
-const ChevronRight = (): React.ReactElement => (
-	<RiArrowRightSLine aria-hidden="true" className="size-4" />
-);
-
-interface CaptionWrapperProps {
-	calendarMonth: CalendarMonth;
-	enableYearNavigation?: boolean;
-	disableNavigation?: boolean;
-	locale?: Partial<Locale>;
-}
-
-const CaptionWrapper = ({
-	calendarMonth,
-	enableYearNavigation,
-	disableNavigation,
-	locale,
-}: CaptionWrapperProps) => (
-	<Caption
-		displayMonth={calendarMonth.date}
-		enableYearNavigation={enableYearNavigation}
-		disableNavigation={disableNavigation}
-		locale={locale as Pick<Locale, "options" | "localize" | "formatLong">}
-	/>
-);
-
-// Create a context for passing props to optimized components
-const CalendarContext = React.createContext<{
-	enableYearNavigation?: boolean;
-	disableNavigation?: boolean;
-	locale?: Partial<Locale>;
-} | null>(null);
-
-// Optimized component definitions outside of parent component
-interface ChevronProps {
-	orientation?: "left" | "right" | "up" | "down";
-}
-
-const ChevronComponent = (props: ChevronProps) => {
-	const { orientation } = props;
-	if (orientation === "left") return <ChevronLeft />;
-	if (orientation === "right") return <ChevronRight />;
-	return <span />;
-};
-
-// Optimized MonthCaption component outside of parent
-const MonthCaptionComponent = ({
-	calendarMonth,
-}: {
-	calendarMonth: CalendarMonth;
-}) => {
-	const { enableYearNavigation, disableNavigation, locale } =
-		React.useContext(CalendarContext) || {};
-	return (
-		<CaptionWrapper
-			calendarMonth={calendarMonth}
-			enableYearNavigation={enableYearNavigation}
-			disableNavigation={disableNavigation}
-			locale={locale}
-		/>
-	);
-};
 
 const Calendar = ({
 	mode = "single",
+	weekStartsOn = 1,
 	numberOfMonths = 1,
 	enableYearNavigation = false,
 	disableNavigation,
-	locale,
+	locale = tr,
 	className,
 	classNames,
 	...props
 }: CalendarProps) => {
-	// Memoize context value to prevent unnecessary re-renders
-	const contextValue = React.useMemo(
-		() => ({ enableYearNavigation, disableNavigation, locale }),
-		[enableYearNavigation, disableNavigation, locale],
-	);
-
 	return (
-		<CalendarContext.Provider value={contextValue}>
-			<DayPicker
-				mode={mode}
-				numberOfMonths={numberOfMonths}
-				locale={locale}
-				showOutsideDays={numberOfMonths === 1}
-				className={cx(className)}
-				classNames={{
-					months: "flex space-y-0",
-					month: "space-y-4 p-3",
-					nav: "gap-1 flex items-center rounded-full size-full justify-between p-4",
-					table: "w-full border-collapse space-y-1",
-					head_cell:
-						"w-9 font-medium text-sm sm:text-xs text-center text-gray-400 dark:text-gray-600 pb-2",
-					row: "w-full mt-0.5",
-					cell: cx(
-						"relative p-0 text-center focus-within:relative",
-						"text-gray-900 dark:text-gray-50",
-					),
-					day: cx(
-						"size-9 rounded text-sm text-gray-900 focus:z-10 dark:text-gray-50",
-						"hover:bg-gray-200 hover:dark:bg-gray-700",
-						focusRing,
-					),
-					day_today: "font-semibold",
-					day_selected: cx(
-						"rounded",
-						"aria-selected:bg-indigo-600 aria-selected:text-gray-50",
-						"dark:aria-selected:bg-indigo-500 dark:aria-selected:text-gray-50",
-					),
-					day_disabled:
-						"!text-gray-300 dark:!text-gray-700 line-through disabled:hover:bg-transparent",
-					day_outside: "text-gray-400 dark:text-gray-600",
-					day_range_middle: cx(
-						"!rounded-none",
-						"aria-selected:!bg-gray-100 aria-selected:!text-gray-900",
-						"dark:aria-selected:!bg-gray-900 dark:aria-selected:!text-gray-50",
-					),
-					day_range_start: "rounded-r-none !rounded-l",
-					day_range_end: "rounded-l-none !rounded-r",
-					day_hidden: "invisible",
-					...classNames,
-				}}
-				components={{
-					Chevron: ChevronComponent,
-					MonthCaption: MonthCaptionComponent,
-				}}
-				{...(props as SingleProps & RangeProps)}
-			/>
-		</CalendarContext.Provider>
+		<DayPicker
+			mode={mode}
+			weekStartsOn={weekStartsOn}
+			numberOfMonths={numberOfMonths}
+			locale={locale}
+			showOutsideDays={numberOfMonths === 1}
+			className={cx(className)}
+			classNames={{
+				months: "flex space-y-0",
+				month: "space-y-4 p-3",
+				nav: "flex items-center justify-between w-full p-2",
+				table: "w-full border-collapse space-y-1",
+				head_cell:
+					"w-9 font-medium text-sm sm:text-xs text-center text-gray-400 dark:text-gray-600 pb-2",
+				row: "w-full mt-0.5",
+				cell: cx(
+					"relative p-0 text-center focus-within:relative",
+					"text-gray-900 dark:text-gray-50",
+				),
+				day: cx(
+					"size-9 rounded text-sm text-gray-900 focus:z-10 dark:text-gray-50",
+					"hover:bg-gray-200 hover:dark:bg-gray-700",
+					focusRing,
+				),
+				day_today: "font-semibold",
+				day_selected: cx(
+					"rounded",
+					"aria-selected:bg-indigo-600 aria-selected:text-gray-50",
+					"dark:aria-selected:bg-indigo-500 dark:aria-selected:text-gray-50",
+				),
+				day_disabled:
+					"!text-gray-300 dark:!text-gray-700 line-through disabled:hover:bg-transparent",
+				day_outside: "text-gray-400 dark:text-gray-600",
+				day_range_middle: cx(
+					"!rounded-none",
+					"aria-selected:!bg-gray-100 aria-selected:!text-gray-900",
+					"dark:aria-selected:!bg-gray-900 dark:aria-selected:!text-gray-50",
+				),
+				day_range_start: "rounded-r-none !rounded-l",
+				day_range_end: "rounded-l-none !rounded-r",
+				day_hidden: "invisible",
+				...classNames,
+			}}
+			components={{
+				IconLeft: () => (
+					<RiArrowLeftSLine aria-hidden="true" className="size-4" />
+				),
+				IconRight: () => (
+					<RiArrowRightSLine aria-hidden="true" className="size-4" />
+				),
+				Caption: ({ ...props }) => {
+					const {
+						goToMonth,
+						nextMonth,
+						previousMonth,
+						currentMonth,
+						displayMonths,
+					} = useNavigation();
+					const { numberOfMonths, fromDate, toDate } = useDayPicker();
+
+					const displayIndex = displayMonths.findIndex((month) =>
+						isSameMonth(props.displayMonth, month),
+					);
+					const isFirst = displayIndex === 0;
+					const isLast = displayIndex === displayMonths.length - 1;
+
+					const hideNextButton = numberOfMonths > 1 && (isFirst || !isLast);
+					const hidePreviousButton = numberOfMonths > 1 && (isLast || !isFirst);
+
+					const goToPreviousYear = () => {
+						const targetMonth = addYears(currentMonth, -1);
+						if (
+							previousMonth &&
+							(!fromDate || targetMonth.getTime() >= fromDate.getTime())
+						) {
+							goToMonth(targetMonth);
+						}
+					};
+
+					const goToNextYear = () => {
+						const targetMonth = addYears(currentMonth, 1);
+						if (
+							nextMonth &&
+							(!toDate || targetMonth.getTime() <= toDate.getTime())
+						) {
+							goToMonth(targetMonth);
+						}
+					};
+
+					return (
+						<div className="relative flex items-center justify-between w-full px-2">
+							{/* Sol navigation butonları */}
+							<div className="flex items-center gap-1">
+								{enableYearNavigation && !hidePreviousButton && (
+									<NavigationButton
+										disabled={
+											disableNavigation ||
+											!previousMonth ||
+											(fromDate &&
+												addYears(currentMonth, -1).getTime() <
+												fromDate.getTime())
+										}
+										aria-label="Önceki yıla git"
+										onClick={goToPreviousYear}
+										icon={RiArrowLeftDoubleLine}
+									/>
+								)}
+								{!hidePreviousButton && (
+									<NavigationButton
+										disabled={disableNavigation || !previousMonth}
+										aria-label="Önceki aya git"
+										onClick={() => previousMonth && goToMonth(previousMonth)}
+										icon={RiArrowLeftSLine}
+									/>
+								)}
+							</div>
+
+							{/* Ay ismi - ortada */}
+							<div
+								role="presentation"
+								aria-live="polite"
+								className="text-sm font-medium capitalize tabular-nums text-gray-900 dark:text-gray-50"
+							>
+								{format(props.displayMonth, "LLLL yyy", { locale })}
+							</div>
+
+							{/* Sağ navigation butonları - mutlak konumlandırma */}
+							<div className="absolute right-0 flex items-center gap-1">
+								{!hideNextButton && (
+									<NavigationButton
+										disabled={disableNavigation || !nextMonth}
+										aria-label="Sonraki aya git"
+										onClick={() => nextMonth && goToMonth(nextMonth)}
+										icon={RiArrowRightSLine}
+									/>
+								)}
+								{enableYearNavigation && !hideNextButton && (
+									<NavigationButton
+										disabled={
+											disableNavigation ||
+											!nextMonth ||
+											(toDate &&
+												addYears(currentMonth, 1).getTime() > toDate.getTime())
+										}
+										aria-label="Sonraki yıla git"
+										onClick={goToNextYear}
+										icon={RiArrowRightDoubleLine}
+									/>
+								)}
+							</div>
+						</div>
+					);
+				},
+			}}
+			{...props}
+		/>
 	);
 };
 

@@ -7,6 +7,7 @@
     <img src="https://img.shields.io/badge/React-19.1.1-61DAFB?style=for-the-badge&logo=react" alt="React" />
     <img src="https://img.shields.io/badge/TypeScript-5.9.2-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript" />
     <img src="https://img.shields.io/badge/Tailwind-4.1.11-06B6D4?style=for-the-badge&logo=tailwindcss" alt="Tailwind CSS" />
+    <img src="https://img.shields.io/badge/Biome-2.2.2-60A5FA?style=for-the-badge&logo=biome" alt="Biome" />
   </p>
 </div>
 
@@ -28,13 +29,17 @@
 | Category | Technology |
  |----------|------------|
  | **Framework** | Next.js 15.4.5 |
- | **UI Library** | Radix UI |
+ | **Runtime** | React 19.1.1 |
+ | **UI Library** | Radix UI (Multiple components) |
  | **Styling** | Tailwind CSS 4.1.11 |
  | **Charts** | Recharts 3.1.2 |
  | **Tables** | TanStack Table 8.21.3 |
  | **Icons** | Remix Icons 4.6.0 |
+ | **Date Handling** | React Aria + Internationalized Date |
+ | **Drag & Drop** | Atlassian Pragmatic DnD 1.7.4 |
+ | **Themes** | next-themes 0.4.6 |
  | **Language** | TypeScript 5.9.2 |
- | **Linting** | Biome 2.1.3 |
+ | **Linting** | Biome 2.2.2 |
 
 ## 🚀 Quick Start
 
@@ -116,22 +121,50 @@ pnpm update           # Check outdated packages
 pnpm update:run       # Update all packages
 ```
 
+## 📦 Key Dependencies
+
+### Core Framework
+- **Next.js 15.4.5** - React framework with App Router
+- **React 19.1.1** - Latest React with concurrent features
+- **TypeScript 5.9.2** - Type-safe development
+
+### UI & Styling
+- **Radix UI Components** - Accessible, unstyled UI primitives
+- **Tailwind CSS 4.1.11** - Utility-first CSS framework
+- **Tailwind Variants 2.1.0** - Component variant management
+- **next-themes 0.4.6** - Theme switching support
+
+### Data Visualization & Interaction
+- **Recharts 3.1.2** - Composable charting library
+- **TanStack Table 8.21.3** - Headless table building
+- **Atlassian Pragmatic DnD 1.7.4** - Drag and drop functionality
+
+### Date & Time
+- **React Aria DatePicker 3.15.0** - Accessible date components
+- **Internationalized Date 3.8.2** - Date internationalization
+- **date-fns 4.1.0** - Date utility library
+- **React Day Picker 9.8.1** - Date picker component
+
+### Development Tools
+- **Biome 2.2.2** - Fast formatter and linter
+- **PostCSS 8.5.6** - CSS transformation tool
+
 ## 🎯 Key Features
 
 ### Dashboard Overview
 - Real-time analytics and metrics
-- Interactive charts and graphs
-- Responsive grid layout
+- Interactive charts with Recharts
+- Responsive grid layout with Tailwind
 
-### Customer Management
-- Customer data tables with sorting/filtering
-- Drag & drop functionality
-- Export capabilities
+### Data Management
+- Advanced table functionality with TanStack Table
+- Drag & drop interfaces with Pragmatic DnD
+- Date picking with React Aria components
 
-### Settings Panel
-- User management
-- Billing configuration
-- General application settings
+### Modern Development
+- Type-safe development with TypeScript
+- Fast formatting and linting with Biome
+- Theme switching with next-themes
 
 ## 🔧 Configuration
 
